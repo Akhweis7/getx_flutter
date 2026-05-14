@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/task.dart';
 import '../models/subtask.dart';
@@ -10,7 +9,6 @@ class KanbanController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final RxList<Task> tasks = <Task>[].obs;
   final RxBool isLoading = true.obs;
-  final columnNameController = TextEditingController();
 
   StreamSubscription? _subscription;
 
@@ -28,7 +26,6 @@ class KanbanController extends GetxController {
   @override
   void onClose() {
     _subscription?.cancel();
-    columnNameController.dispose();
     super.onClose();
   }
 
@@ -45,12 +42,13 @@ class KanbanController extends GetxController {
     });
   }
 
-  Future<void> addTask() async {
-    final title = columnNameController.text.trim();
-    if (title.isEmpty) return;
-    columnNameController.clear();
+  Future<void> addTask({
+    required String title,
+    required int durationMinutes,
+  }) async {
     await _tasksRef.add({
       'title': title,
+      'durationMinutes': durationMinutes,
       'subtasks': [],
       'createdAt': FieldValue.serverTimestamp(),
     });

@@ -19,41 +19,74 @@ class KanbanBoardScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          _buildAddColumnBar(controller),
+          _buildAddColumnBar(context, controller),
           Expanded(child: _buildBoard(controller)),
         ],
       ),
     );
   }
 
-  Widget _buildAddColumnBar(KanbanController controller) {
+  Widget _buildAddColumnBar(BuildContext context, KanbanController controller) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller.columnNameController,
-              onSubmitted: (_) => controller.addTask(),
-              decoration: InputDecoration(
-                hintText: 'Enter column name',
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () => _showAddColumnDialog(controller),
+          icon: const Icon(Icons.add),
+          label: const Text('Add Column'),
+        ),
+      ),
+    );
+  }
+
+  void _showAddColumnDialog(KanbanController controller) {
+    final nameController = TextEditingController();
+    final minutesController = TextEditingController();
+
+    Get.dialog(
+      AlertDialog(
+        title: const Text('New Column'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Column name *',
+                border: OutlineInputBorder(),
               ),
             ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: minutesController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Duration (minutes)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
           ),
-          const SizedBox(width: 8),
-          IconButton.filled(
-            tooltip: 'Add column',
-            onPressed: controller.addTask,
-            icon: const Icon(Icons.add),
+          ElevatedButton(
+            onPressed: () {
+              final name = nameController.text.trim();
+              final minutes = int.tryParse(minutesController.text.trim()) ?? 0;
+              if (name.isEmpty) return;
+              controller.addTask(
+                title: name,
+                durationMinutes: minutes,
+              );
+              Get.back();
+            },
+            child: const Text('Add'),
           ),
         ],
       ),
@@ -88,6 +121,7 @@ class KanbanBoardScreen extends StatelessWidget {
                 controller.addSubtask(task.id, title, username),
             ondeletesubtask: (subtask) =>
                 controller.deleteSubtask(task.id, subtask),
+            ondeletetask: () => controller.deleteTask(task.id),
           );
         },
       );
