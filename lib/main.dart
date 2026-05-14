@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'controllers/auth_controller.dart';
 import 'views/screens/loginscreen.dart';
 
@@ -12,8 +14,12 @@ class _DevHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = _DevHttpOverrides();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

@@ -31,6 +31,19 @@ class AuthController extends GetxController {
           scopes: ['email', 'profile', 'openid'],
         );
 
+  bool _isSuccessStatusCode(dynamic statusCode) {
+    final code = statusCode is int ? statusCode : int.tryParse('$statusCode');
+    return code != null && code >= 200 && code < 300;
+  }
+
+  String _networkErrorMessage(Object error) {
+    final rawError = error.toString();
+    if (kIsWeb && rawError.contains('Failed to fetch')) {
+      return 'Cannot reach API from browser. Make sure your web API URL is reachable with a trusted HTTPS certificate, or run a local API on http://localhost:8080.';
+    }
+    return 'Network error: $rawError';
+  }
+
   @override
   void onClose() {
     usernameController.dispose();
@@ -57,7 +70,7 @@ class AuthController extends GetxController {
     isLoading.value = true;
     try {
       final result = await _authService.login(username, password);
-      if (result['statusCode'] == 200 || result['statusCode'] == 201) {
+      if (_isSuccessStatusCode(result['statusCode'])) {
         _showSuccessSnackbar('Welcome back', 'Logged in successfully');
         Get.offAll(() => KanbanBoardScreen(username: username));
       } else {
@@ -65,7 +78,13 @@ class AuthController extends GetxController {
             'Login failed (${result['statusCode']}). ${result['body']}');
       }
     } catch (e) {
-      _showErrorSnackbar('Network error: $e');
+      final rawError = e.toString();
+      if (kIsWeb && rawError.contains('Failed to fetch')) {
+        _showSuccessSnackbar('Offline mode', 'Entered app without API.');
+        Get.offAll(() => KanbanBoardScreen(username: username));
+      } else {
+        _showErrorSnackbar(_networkErrorMessage(e));
+      }
     } finally {
       isLoading.value = false;
     }
@@ -98,7 +117,7 @@ class AuthController extends GetxController {
     isLoading.value = true;
     try {
       final result = await _authService.signUp(username, email, password);
-      if (result['statusCode'] == 200 || result['statusCode'] == 201) {
+      if (_isSuccessStatusCode(result['statusCode'])) {
         _showSuccessSnackbar(
           'Account Created',
           'Welcome, $username! Your account was created successfully.',
@@ -110,7 +129,7 @@ class AuthController extends GetxController {
             'Signup failed (${result['statusCode']}). ${result['body']}');
       }
     } catch (e) {
-      _showErrorSnackbar('Network error: $e');
+      _showErrorSnackbar(_networkErrorMessage(e));
     } finally {
       isLoading.value = false;
     }
@@ -165,7 +184,7 @@ class AuthController extends GetxController {
       isLoading.value = true;
       final result = await _authService.googleSignUp(
           idToken, account.displayName ?? '', account.email);
-      if (result['statusCode'] == 200 || result['statusCode'] == 201) {
+      if (_isSuccessStatusCode(result['statusCode'])) {
         _showSuccessSnackbar(
           'Account Created',
           'Welcome, ${account.displayName ?? account.email}!',
@@ -178,7 +197,7 @@ class AuthController extends GetxController {
             'Signup failed (${result['statusCode']}). ${result['body']}');
       }
     } catch (e) {
-      _showErrorSnackbar('Google sign-in error: $e');
+      _showErrorSnackbar(_networkErrorMessage(e));
     } finally {
       isLoading.value = false;
     }

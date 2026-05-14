@@ -35,6 +35,9 @@ class RegisterScreen extends GetView<AuthController> {
                     hintText: 'Enter your name',
                   ),
                 ),
+                /*Platform  Firebase App Id
+web       1:207920446622:web:109d1a345a8f74ab9ecf8f
+                */ 
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: controller.emailController,

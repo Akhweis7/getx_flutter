@@ -3,9 +3,16 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static String get _baseUrl => kIsWeb
-      ? 'http://localhost:8080/Auth'
-      : 'https://185.140.181.252/kanban/api/Auth';
+  static const String _webBaseUrl = 'http://localhost:8080/Auth';
+  static const String _mobileBaseUrl = 'https://185.140.181.252/kanban/api/Auth';
+
+  static String get _baseUrl {
+    const configuredBaseUrl = String.fromEnvironment('API_BASE_URL');
+    if (configuredBaseUrl.isNotEmpty) {
+      return configuredBaseUrl;
+    }
+    return kIsWeb ? _webBaseUrl : _mobileBaseUrl;
+  }
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await http.post(

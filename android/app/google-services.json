@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "207920446622",
+    "project_id": "fluuterbase",
+    "storage_bucket": "fluuterbase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207920446622:android:28159bec380767219ecf8f",
+        "android_client_info": {
+          "package_name": "com.example.getx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtm5FERmWwqrAA3ZyhywKLz7UqJj8ljI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
