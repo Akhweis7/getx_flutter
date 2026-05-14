@@ -27,7 +27,7 @@ class LoginScreen extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 40),
                 const Text(
-                  'Username',
+                  'Email',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -35,12 +35,13 @@ class LoginScreen extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 15),
                 TextField(
-                  controller: controller.usernameController,
+                  controller: controller.emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
-                    hintText: 'Enter your username',
+                    hintText: 'Enter your email',
                   ),
                 ),
                 const SizedBox(height: 20),

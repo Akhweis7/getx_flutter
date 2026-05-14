@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "207920446622",
-    "project_id": "fluuterbase",
-    "storage_bucket": "fluuterbase.firebasestorage.app"
+    "project_number": "601604995816",
+    "project_id": "canvan-b01b1",
+    "storage_bucket": "canvan-b01b1.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:207920446622:android:28159bec380767219ecf8f",
+        "mobilesdk_app_id": "1:601604995816:android:539922263195607525675d",
         "android_client_info": {
           "package_name": "com.example.getx"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAtm5FERmWwqrAA3ZyhywKLz7UqJj8ljI4"
+          "current_key": "AIzaSyA4ZJ3vqnPpf-gAYg2uOo3-r6ISvTOBoc4"
         }
       ],
       "services": {

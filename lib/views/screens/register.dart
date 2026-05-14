@@ -35,9 +35,6 @@ class RegisterScreen extends GetView<AuthController> {
                     hintText: 'Enter your name',
                   ),
                 ),
-                /*Platform  Firebase App Id
-web       1:207920446622:web:109d1a345a8f74ab9ecf8f
-                */ 
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: controller.emailController,
@@ -111,39 +108,22 @@ web       1:207920446622:web:109d1a345a8f74ab9ecf8f
                 const SizedBox(height: 20),
                 Obx(() => controller.isLoading.value
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : Column(
-                        children: [
-                          InkWell(
-                            onTap: controller.signUp,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                              ),
-                              child: const Text(
-                                ' Register ',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                    : InkWell(
+                        onTap: controller.signUp,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                          ),
+                          child: const Text(
+                            ' Register ',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          OutlinedButton.icon(
-                            onPressed: controller.googleSignUp,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            icon: const Icon(Icons.login),
-                            label: const Text('Sign up with Google'),
-                          ),
-                        ],
+                        ),
                       )),
               ],
             ),

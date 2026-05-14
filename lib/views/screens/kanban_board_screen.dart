@@ -1,67 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:getx/models/subtask.dart';
-import 'package:getx/models/task.dart';
+import 'package:get/get.dart';
+import 'package:getx/controllers/kanban_controller.dart';
 import 'package:getx/views/screens/kanban.dart';
 
-class KanbanBoardScreen extends StatefulWidget {
+class KanbanBoardScreen extends StatelessWidget {
   const KanbanBoardScreen({super.key, required this.username});
 
   final String username;
 
   @override
-  State<KanbanBoardScreen> createState() => _KanbanBoardScreenState();
-}
-
-class _KanbanBoardScreenState extends State<KanbanBoardScreen> {
-  final TextEditingController _columnnamecontroller = TextEditingController();
-  final List<Task> _tasks = []; //Task.sampleList();
-
-  @override
-  void dispose() {
-    _columnnamecontroller.dispose();
-    super.dispose();
-  }
-
-  void addcolumn() {
-    final title = _columnnamecontroller.text.trim();
-    if (title.isEmpty) return;
-    setState(() {
-      _tasks.add(Task(title: title));
-      _columnnamecontroller.clear();
-    });
-  }
-
-  void addsubtask(int columnindex, String title) {
-    setState(() {
-      _tasks[columnindex].subtasks.add(
-        Subtask(title: title, username: widget.username),
-      );
-    });
-  }
-
-  void deletesubtask(int columnindex, Subtask subtask) {
-    setState(() {
-      _tasks[columnindex].subtasks.remove(subtask);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.put(KanbanController());
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kanban Board - ${widget.username}'),
+        title: Text('Kanban Board - $username'),
         centerTitle: false,
       ),
       body: Column(
         children: [
-          buildaddcolumnbar(),
-          Expanded(child: buildboard()),
+          _buildAddColumnBar(controller),
+          Expanded(child: _buildBoard(controller)),
         ],
       ),
     );
   }
 
-  Widget buildaddcolumnbar() {
+  Widget _buildAddColumnBar(KanbanController controller) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -69,8 +34,8 @@ class _KanbanBoardScreenState extends State<KanbanBoardScreen> {
         children: [
           Expanded(
             child: TextField(
-              controller: _columnnamecontroller,
-              onSubmitted: (_) => addcolumn(),
+              controller: controller.columnNameController,
+              onSubmitted: (_) => controller.addTask(),
               decoration: InputDecoration(
                 hintText: 'Enter column name',
                 isDense: true,
@@ -87,7 +52,7 @@ class _KanbanBoardScreenState extends State<KanbanBoardScreen> {
           const SizedBox(width: 8),
           IconButton.filled(
             tooltip: 'Add column',
-            onPressed: addcolumn,
+            onPressed: controller.addTask,
             icon: const Icon(Icons.add),
           ),
         ],
@@ -95,29 +60,37 @@ class _KanbanBoardScreenState extends State<KanbanBoardScreen> {
     );
   }
 
-  Widget buildboard() {
-    if (_tasks.isEmpty) {
-      return const Center(
-        child: Text(
-          'No columns yet. Add one above to get started.',
-          style: TextStyle(color: Colors.black54),
-        ),
-      );
-    }
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _tasks.length,
-      itemBuilder: (context, index) {
-        return KanbanColumn(
-          goal: 'Goal',
-          TechStack: 'TechStack',
-          dueDate: 'Due Date',
-          task: _tasks[index],
-          onaddsubtask: (title) => addsubtask(index, title),
-          ondeletesubtask: (subtask) => deletesubtask(index, subtask),
+  Widget _buildBoard(KanbanController controller) {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (controller.tasks.isEmpty) {
+        return const Center(
+          child: Text(
+            'No columns yet. Add one above to get started.',
+            style: TextStyle(color: Colors.black54),
+          ),
         );
-      },
-    );
+      }
+      return ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: controller.tasks.length,
+        itemBuilder: (context, index) {
+          final task = controller.tasks[index];
+          return KanbanColumn(
+            goal: 'Goal',
+            TechStack: 'TechStack',
+            dueDate: 'Due Date',
+            task: task,
+            onaddsubtask: (title) =>
+                controller.addSubtask(task.id, title, username),
+            ondeletesubtask: (subtask) =>
+                controller.deleteSubtask(task.id, subtask),
+          );
+        },
+      );
+    });
   }
 }

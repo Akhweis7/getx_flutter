@@ -1,48 +1,20 @@
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../services/auth_service.dart';
 import '../views/screens/kanban_board_screen.dart';
 
 class AuthController extends GetxController {
-  // Form controllers
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  // Reactive state
   final RxBool isLoading = false.obs;
   final RxBool obscurePassword = true.obs;
   final RxBool obscureConfirmPassword = true.obs;
-  final RxString errorMessage = ''.obs;
 
   final AuthService _authService = AuthService();
-  final GoogleSignIn _googleSignIn = kIsWeb
-      ? GoogleSignIn(
-          clientId:
-              '379014504202-6ojasthm1cjls3l8bvpgmq6eevcbqssa.apps.googleusercontent.com',
-          scopes: ['email', 'profile', 'openid'],
-        )
-      : GoogleSignIn(
-          serverClientId:
-              '379014504202-6ojasthm1cjls3l8bvpgmq6eevcbqssa.apps.googleusercontent.com',
-          scopes: ['email', 'profile', 'openid'],
-        );
-
-  bool _isSuccessStatusCode(dynamic statusCode) {
-    final code = statusCode is int ? statusCode : int.tryParse('$statusCode');
-    return code != null && code >= 200 && code < 300;
-  }
-
-  String _networkErrorMessage(Object error) {
-    final rawError = error.toString();
-    if (kIsWeb && rawError.contains('Failed to fetch')) {
-      return 'Cannot reach API from browser. Make sure your web API URL is reachable with a trusted HTTPS certificate, or run a local API on http://localhost:8080.';
-    }
-    return 'Network error: $rawError';
-  }
 
   @override
   void onClose() {
@@ -59,32 +31,29 @@ class AuthController extends GetxController {
   }
 
   Future<void> login() async {
-    final username = usernameController.text.trim();
+    final email = emailController.text.trim();
     final password = passwordController.text;
 
-    if (username.isEmpty || password.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       _showErrorSnackbar('Please fill all fields');
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showErrorSnackbar('Please enter a valid email address');
       return;
     }
 
     isLoading.value = true;
     try {
-      final result = await _authService.login(username, password);
-      if (_isSuccessStatusCode(result['statusCode'])) {
-        _showSuccessSnackbar('Welcome back', 'Logged in successfully');
-        Get.offAll(() => KanbanBoardScreen(username: username));
-      } else {
-        _showErrorSnackbar(
-            'Login failed (${result['statusCode']}). ${result['body']}');
-      }
+      final credential = await _authService.login(email, password);
+      final username = credential.user?.displayName ?? credential.user?.email ?? '';
+      _showSuccessSnackbar('Welcome back', 'Logged in successfully');
+      Get.offAll(() => KanbanBoardScreen(username: username));
+    } on FirebaseAuthException catch (e) {
+      _showErrorSnackbar(_firebaseErrorMessage(e.code));
     } catch (e) {
-      final rawError = e.toString();
-      if (kIsWeb && rawError.contains('Failed to fetch')) {
-        _showSuccessSnackbar('Offline mode', 'Entered app without API.');
-        Get.offAll(() => KanbanBoardScreen(username: username));
-      } else {
-        _showErrorSnackbar(_networkErrorMessage(e));
-      }
+      _showErrorSnackbar('An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -96,10 +65,7 @@ class AuthController extends GetxController {
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
-    if (username.isEmpty ||
-        email.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty) {
+    if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       _showErrorSnackbar('Please fill all fields');
       return;
     }
@@ -116,22 +82,40 @@ class AuthController extends GetxController {
 
     isLoading.value = true;
     try {
-      final result = await _authService.signUp(username, email, password);
-      if (_isSuccessStatusCode(result['statusCode'])) {
-        _showSuccessSnackbar(
-          'Account Created',
-          'Welcome, $username! Your account was created successfully.',
-        );
-        _clearRegisterFields();
-        Get.offAll(() => KanbanBoardScreen(username: username));
-      } else {
-        _showErrorSnackbar(
-            'Signup failed (${result['statusCode']}). ${result['body']}');
-      }
+      await _authService.signUp(username, email, password);
+      _showSuccessSnackbar(
+        'Account Created',
+        'Welcome, $username! Your account was created successfully.',
+      );
+      _clearRegisterFields();
+      Get.offAll(() => KanbanBoardScreen(username: username));
+    } on FirebaseAuthException catch (e) {
+      _showErrorSnackbar(_firebaseErrorMessage(e.code));
     } catch (e) {
-      _showErrorSnackbar(_networkErrorMessage(e));
+      _showErrorSnackbar('An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  String _firebaseErrorMessage(String code) {
+    switch (code) {
+      case 'user-not-found':
+        return 'No account found with this email.';
+      case 'wrong-password':
+        return 'Incorrect password.';
+      case 'invalid-credential':
+        return 'Invalid email or password.';
+      case 'email-already-in-use':
+        return 'An account already exists with this email.';
+      case 'weak-password':
+        return 'Password must be at least 6 characters.';
+      case 'invalid-email':
+        return 'Please enter a valid email address.';
+      case 'too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      default:
+        return 'Authentication error: $code';
     }
   }
 
@@ -165,45 +149,8 @@ class AuthController extends GetxController {
     );
   }
 
-  Future<void> googleSignUp() async {
-    try {
-      final account = await _googleSignIn.signIn();
-      if (account == null) return;
-
-      final auth = await account.authentication;
-      final idToken = auth.idToken;
-
-      print('Google idToken: $idToken');
-      print('Google accessToken: ${auth.accessToken}');
-
-      if (idToken == null) {
-        _showErrorSnackbar('Failed to get Google token');
-        return;
-      }
-
-      isLoading.value = true;
-      final result = await _authService.googleSignUp(
-          idToken, account.displayName ?? '', account.email);
-      if (_isSuccessStatusCode(result['statusCode'])) {
-        _showSuccessSnackbar(
-          'Account Created',
-          'Welcome, ${account.displayName ?? account.email}!',
-        );
-        Get.offAll(() => KanbanBoardScreen(
-              username: account.displayName ?? account.email,
-            ));
-      } else {
-        _showErrorSnackbar(
-            'Signup failed (${result['statusCode']}). ${result['body']}');
-      }
-    } catch (e) {
-      _showErrorSnackbar(_networkErrorMessage(e));
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   void _clearRegisterFields() {
+    usernameController.clear();
     emailController.clear();
     passwordController.clear();
     confirmPasswordController.clear();

@@ -41,48 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBo8I243id0Lzy_Usb_7MzlkSi-X7KNmCA',
-    appId: '1:207920446622:web:109d1a345a8f74ab9ecf8f',
-    messagingSenderId: '207920446622',
-    projectId: 'fluuterbase',
-    authDomain: 'fluuterbase.firebaseapp.com',
-    storageBucket: 'fluuterbase.firebasestorage.app',
-    measurementId: 'G-C51TKPGJ34',
+    apiKey: 'AIzaSyC1UPGMeXXiW-PMyhdApkuApAW4lmE3yYg',
+    appId: '1:601604995816:web:8dbefb3ef614cd9025675d',
+    messagingSenderId: '601604995816',
+    projectId: 'canvan-b01b1',
+    authDomain: 'canvan-b01b1.firebaseapp.com',
+    storageBucket: 'canvan-b01b1.firebasestorage.app',
+    measurementId: 'G-D4Y0ZSRY8Y',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAtm5FERmWwqrAA3ZyhywKLz7UqJj8ljI4',
-    appId: '1:207920446622:android:28159bec380767219ecf8f',
-    messagingSenderId: '207920446622',
-    projectId: 'fluuterbase',
-    storageBucket: 'fluuterbase.firebasestorage.app',
+    apiKey: 'AIzaSyA4ZJ3vqnPpf-gAYg2uOo3-r6ISvTOBoc4',
+    appId: '1:601604995816:android:539922263195607525675d',
+    messagingSenderId: '601604995816',
+    projectId: 'canvan-b01b1',
+    storageBucket: 'canvan-b01b1.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDkFyjMR_7oS85-ZYQICliztAqzjPjd6xY',
-    appId: '1:207920446622:ios:e6d48cee6057b1919ecf8f',
-    messagingSenderId: '207920446622',
-    projectId: 'fluuterbase',
-    storageBucket: 'fluuterbase.firebasestorage.app',
+    apiKey: 'AIzaSyDv7TKPomlecViAD11kNafGS40ZfScG6ZQ',
+    appId: '1:601604995816:ios:def23690c2dcf36f25675d',
+    messagingSenderId: '601604995816',
+    projectId: 'canvan-b01b1',
+    storageBucket: 'canvan-b01b1.firebasestorage.app',
     iosBundleId: 'com.example.getx',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDkFyjMR_7oS85-ZYQICliztAqzjPjd6xY',
-    appId: '1:207920446622:ios:e6d48cee6057b1919ecf8f',
-    messagingSenderId: '207920446622',
-    projectId: 'fluuterbase',
-    storageBucket: 'fluuterbase.firebasestorage.app',
+    apiKey: 'AIzaSyDv7TKPomlecViAD11kNafGS40ZfScG6ZQ',
+    appId: '1:601604995816:ios:def23690c2dcf36f25675d',
+    messagingSenderId: '601604995816',
+    projectId: 'canvan-b01b1',
+    storageBucket: 'canvan-b01b1.firebasestorage.app',
     iosBundleId: 'com.example.getx',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBo8I243id0Lzy_Usb_7MzlkSi-X7KNmCA',
-    appId: '1:207920446622:web:dcd086c35eab91039ecf8f',
-    messagingSenderId: '207920446622',
-    projectId: 'fluuterbase',
-    authDomain: 'fluuterbase.firebaseapp.com',
-    storageBucket: 'fluuterbase.firebasestorage.app',
-    measurementId: 'G-PQ7L3LVYYY',
+    apiKey: 'AIzaSyC1UPGMeXXiW-PMyhdApkuApAW4lmE3yYg',
+    appId: '1:601604995816:web:7fc7dcb5eb83400125675d',
+    messagingSenderId: '601604995816',
+    projectId: 'canvan-b01b1',
+    authDomain: 'canvan-b01b1.firebaseapp.com',
+    storageBucket: 'canvan-b01b1.firebasestorage.app',
+    measurementId: 'G-BY775NT5B6',
   );
 }
